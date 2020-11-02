@@ -12,7 +12,7 @@ public class ReadWrite {
         writer.write(String.valueOf(line1));
         for(int a=0;a<hotelInfo.size();a++) {
             HotelInfo index=hotelInfo.get(a);
-            String line2[]= {index.getHotelName(), String.valueOf(index.getRateForRegularCustomer())};
+            String line2[]= {index.getHotelName(), String.valueOf(index.getWeekDayRate())};
             writer.write(String.valueOf(line2));
         }
         writer.flush();

@@ -12,9 +12,9 @@ public class HotelReservationSystem  {
     Scanner scanner = new Scanner(System.in);
     HotelInfo hotelReservation;
     public void addHotel() {
-        hotelInfo.add(new HotelInfo("LakeWood", 110,3));
-        hotelInfo.add(new HotelInfo("BridgeWood", 160,4));
-        hotelInfo.add(new HotelInfo("RidgeWood", 220,5));
+        hotelInfo.add(new HotelInfo("LakeWood", 110,3,90));
+        hotelInfo.add(new HotelInfo("BridgeWood", 160,4,50));
+        hotelInfo.add(new HotelInfo("RidgeWood", 220,5,150));
         hotelInfo.stream().forEach(System.out::println);
     }
 
@@ -52,11 +52,11 @@ public class HotelReservationSystem  {
         int Days = (int) TimeUnit.DAYS.convert(Duration,TimeUnit.MILLISECONDS);
 
         for (int hotel = 0; hotel < hotelInfo.size(); hotel++) {
-            int newRate = hotelInfo.get(hotel).getRateForRegularCustomer() * (Days+1);
-            hotelInfo.get(hotel).setRateForRegularCustomer(newRate);
+            int newRate = hotelInfo.get(hotel).getWeekDayRate() * (Days+1);
+            hotelInfo.get(hotel).setWeekDayRate(newRate);
         }
-        int regularRate = hotelInfo.stream().min(Comparator.comparing(HotelInfo::getRateForRegularCustomer)).get().getRateForRegularCustomer();
-        String hotelName = hotelInfo.stream().min(Comparator.comparing(HotelInfo::getRateForRegularCustomer)).get().getHotelName();
+        int regularRate = hotelInfo.stream().min(Comparator.comparing(HotelInfo::getWeekDayRate)).get().getWeekDayRate();
+        String hotelName = hotelInfo.stream().min(Comparator.comparing(HotelInfo::getWeekDayRate)).get().getHotelName();
 
         System.out.println(hotelName + ", Total Rates: $" + regularRate);
 

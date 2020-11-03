@@ -3,6 +3,9 @@ package hotelReservationsystem;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -18,55 +21,51 @@ public class HotelReservationSystem  {
         hotelInfo.stream().forEach(System.out::println);
     }
 
-    public boolean toCheckDate(String dateToReserved, String dateFromat){
-        SimpleDateFormat sdf = new SimpleDateFormat(dateFromat);
-        sdf.setLenient(false);
-        try {
-            Date date = sdf.parse(dateToReserved);
-            Calendar currentDateAfter3Months = Calendar.getInstance();
-            currentDateAfter3Months.add(Calendar.MONTH, 3);
-
-            Calendar currentDateBefore3Months = Calendar.getInstance();
-            currentDateBefore3Months.add(Calendar.MONTH, -3);
-
-            if (date.before(currentDateAfter3Months.getTime()) && date.after(currentDateBefore3Months.getTime())) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-    }
     public String CheapestHotelAndRate(String arrivalDate, String checkoutDate) throws ParseException {
         String dateRegex = "^(([0-9])|([0-2][0-9])|([3][0-1]))(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\d{4}$";
         if(!arrivalDate.matches(dateRegex) && !checkoutDate.matches(dateRegex)) {
             System.out.println("Invalid date");
             System.exit(0);
         }
-        Date StartDate = convertStringToDate(arrivalDate);
-        Date EndDate = convertStringToDate(checkoutDate);
-        long Duration = EndDate.getTime()-StartDate.getTime();
-        int Days = (int) TimeUnit.DAYS.convert(Duration,TimeUnit.MILLISECONDS);
+        LocalDate StartDate = convertStringToDate(arrivalDate);
+        LocalDate EndDate = convertStringToDate(checkoutDate);
+        int minHotelBill = Integer.MAX_VALUE;
+        String minWeeKDayHotelName = null;
+        String minWeekEndHotelName=null;
 
-        for (int hotel = 0; hotel < hotelInfo.size(); hotel++) {
-            int newRate = hotelInfo.get(hotel).getWeekDayRate() * (Days+1);
-            hotelInfo.get(hotel).setWeekDayRate(newRate);
+        for (HotelInfo hotelDetails : hotelInfo) {
+            LocalDate start = StartDate;
+            LocalDate end = EndDate.plusDays(1);
+            int hotelBill = 0;
+            while (!(start.equals(end))) {
+                int day = start.getDayOfWeek().getValue();
+                if (day == 6 || day == 7){
+                    hotelBill = hotelBill +hotelDetails.getWeekEndRate();
+                }
+                else{
+                    hotelBill = hotelBill + hotelDetails.getWeekDayRate();
+                }
+                start = start.plusDays(1);
+            }
+             minWeeKDayHotelName=hotelInfo.stream().min((Comparator.comparing(HotelInfo::getWeekDayRate))).get().getHotelName();
+             minWeekEndHotelName=hotelInfo.stream().min((Comparator.comparing(HotelInfo::getWeekEndRate))).get().getHotelName();
+
+            if (hotelBill <= minHotelBill) {
+                minHotelBill = hotelBill;
+                System.out.println(minWeeKDayHotelName+" and "+minWeekEndHotelName+","+minHotelBill);
+            }
         }
-        int regularRate = hotelInfo.stream().min(Comparator.comparing(HotelInfo::getWeekDayRate)).get().getWeekDayRate();
-        String hotelName = hotelInfo.stream().min(Comparator.comparing(HotelInfo::getWeekDayRate)).get().getHotelName();
 
-        System.out.println(hotelName + ", Total Rates: $" + regularRate);
-
-        return hotelName + ", $" + regularRate;
-
+        return minWeeKDayHotelName+" and "+minWeekEndHotelName+","+minHotelBill;
     }
-    public Date convertStringToDate(String dateString) throws ParseException {
-        Date date;
-        DateFormat dateFormat = new SimpleDateFormat("ddMMMyyyy");
-        date = dateFormat.parse(dateString);
+    public static LocalDate convertStringToDate(String dateString) {
+        LocalDate date = null;
+        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("ddMMMyyyy");
+        try {
+            date = LocalDate.parse(dateString, dateTimeFormat);
+        } catch (DateTimeParseException e) {
+            e.printStackTrace();
+        }
         return date;
     }
 }

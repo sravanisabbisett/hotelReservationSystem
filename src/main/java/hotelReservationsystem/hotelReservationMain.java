@@ -1,5 +1,6 @@
 package hotelReservationsystem;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class hotelReservationMain extends HotelReservationSystem{
@@ -16,6 +17,7 @@ public class hotelReservationMain extends HotelReservationSystem{
         String checkoutDate =scanner.nextLine();
         hotelReservationSystem.addHotel();
         hotelReservationSystem.CheapestHotelAndRate(arrivalDate,checkoutDate);
+
 
     }
 }

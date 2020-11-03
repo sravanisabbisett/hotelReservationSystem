@@ -1,13 +1,11 @@
 package hotelReservationsystem;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class HotelReservationSystem  {
 
@@ -30,9 +28,7 @@ public class HotelReservationSystem  {
         LocalDate StartDate = convertStringToDate(arrivalDate);
         LocalDate EndDate = convertStringToDate(checkoutDate);
         int minHotelBill = Integer.MAX_VALUE;
-        String minWeeKDayHotelName = null;
-        String minWeekEndHotelName=null;
-
+        HashMap<String,Integer> cheapestHotel=new HashMap<>();
         for (HotelInfo hotelDetails : hotelInfo) {
             LocalDate start = StartDate;
             LocalDate end = EndDate.plusDays(1);
@@ -47,17 +43,19 @@ public class HotelReservationSystem  {
                 }
                 start = start.plusDays(1);
             }
-             minWeeKDayHotelName=hotelInfo.stream().min((Comparator.comparing(HotelInfo::getWeekDayRate))).get().getHotelName();
-             minWeekEndHotelName=hotelInfo.stream().min((Comparator.comparing(HotelInfo::getWeekEndRate))).get().getHotelName();
-
             if (hotelBill <= minHotelBill) {
                 minHotelBill = hotelBill;
-                System.out.println(minWeeKDayHotelName+" and "+minWeekEndHotelName+","+minHotelBill);
+                cheapestHotel.put(hotelDetails.getHotelName(),hotelBill);
             }
         }
-
-        return minWeeKDayHotelName+" and "+minWeekEndHotelName+","+minHotelBill;
+        String minimumHotelBillName=Collections.min(cheapestHotel.keySet());
+        Integer minimumHotelBill = Collections.min(cheapestHotel.values());
+        System.out.println(minimumHotelBillName+","+minimumHotelBill);
+        return minimumHotelBillName+","+minimumHotelBill;
     }
+
+
+
     public static LocalDate convertStringToDate(String dateString) {
         LocalDate date = null;
         DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("ddMMMyyyy");
